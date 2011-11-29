@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TouchWidget</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="jquery.touch.js"></script>
+	<script>
+		$(function () {
+			$("#test").swipe({
+				swiped: function (e, ui) {
+					$("#textDirection").html(ui.swipeDirection);
+				}
+			}
+		});
+	</script>
+</head>
+<body>
+	<div id="textDirection">Swipe box:</div>
+	<div id="test" style="width: 200px; height: 200px; background-color: red;">	
+	</div>
+</body>
+</html>

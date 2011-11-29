@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>TouchWidget</title>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="jquery.touch.js"></script>
-	<script>
-		$(function () {
-			$("#test").swipe({
-				swiped: function (e, ui) {
-					$("#textDirection").html(ui.swipeDirection);
-				}
-			}
-		});
-	</script>
-</head>
-<body>
-	<div id="textDirection">Swipe box:</div>
-	<div id="test" style="width: 200px; height: 200px; background-color: red;">	
-	</div>
-</body>
-</html>
+see sample.htm
+
+uses touch support for ipad - (tested on ipad only at this point - *should* work on android)
+supports mouse as well
+
+options:
+see jquery.swipe.js options
+
+minSwipeLength: 65, // the shortest distance the user may swipe - the lower the number the more sensitive
+minMouseSwipeLength: 20,
+preventDefault :false //used on TouchStart - setting this to true would negate things like button press from working, etc...
+
+ui.swipeDirection returns the swipe direction 'up', 'down', 'left', 'right'
+
+$("#test").swipe({
+	swiped: function (e, ui) {
+		$("#textDirection").html(ui.swipeDirection);
+	}
+}
