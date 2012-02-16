@@ -17,3 +17,12 @@ $("#test").swipe({
 		$("#textDirection").html(ui.swipeDirection);
 	}
 }
+
+Version 1.0.2
+2/16/2012 Added Windows 8 tablet touch support
+In order to work with Windows 8 touch, add the following to the html, body CSS:
+overflow: hidden; 
+-ms-content-zooming: none;/* Disable pan/zoom */
+
+Created AMD version using volo - to amdify - use node ie.  node volo amdify depends=jquery jquery.swipe.amd.js
+(see: http://github.com/volojs/volo for details)

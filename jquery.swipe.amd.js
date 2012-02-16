@@ -1,3 +1,6 @@
+//Wrapped in an outer function to preserve global this
+(function (root) { define(['jquery'], function () { (function () {
+
 /*
 * swipe 1.0.2 - jQuery UI Widget
 * https://github.com/sgentile/jquery.swipe
@@ -246,3 +249,9 @@
         }
     });
 })(jQuery);
+
+
+}.call(root));
+
+
+}); }(this));
