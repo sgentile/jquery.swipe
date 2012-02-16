@@ -55,6 +55,7 @@
 						self.initialXMousePosition = event.pageX;
 						self.initialYMousePosition = event.pageY;
 						//event.stopPropagation();
+						event.preventDefault();
 					},
 					"mouseup": function (event) {
 						var x = event.pageX;
