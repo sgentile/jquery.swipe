@@ -7,7 +7,7 @@
 * Copyright (c) 2011 Steve Gentile (http://twitter.com/stevemgentile)
 * Dual licensed under the MIT and GPL licenses
 */
-(function ($) {
+(function ($, debug) {
 	$.widget("ui.swipe", {
 		options: {
 			minSwipeLength: 65, // the shortest distance the user may swipe - the lower the number the more sensitive
@@ -248,7 +248,7 @@
             }
         }
     });
-})(jQuery);
+})(jQuery, console);
 
 
 }.call(root));
