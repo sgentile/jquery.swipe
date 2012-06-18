@@ -44,8 +44,8 @@
 					self.touchCancel(event.originalEvent);
 				},
 				"touchend": function (event) {
-					self.touchEnd(event.originalEvent, function (swipe) {
-						self._trigger("swiped", event, { swipeDirection: swipe });
+					self.touchEnd(event.originalEvent, function (swipe, speed) {
+						self._trigger("swiped", event, { swipeDirection: swipe, swipeSpeed: speed });
 					});
 				}
 			});
@@ -70,9 +70,9 @@
                     },
                     "MSPointerUp": function (event) {
                         debug.info("MSPointerUp");
-                        self.touchEnd(event.originalEvent, function (swipe) {
+                        self.touchEnd(event.originalEvent, function (swipe, speed) {
                             debug.info("MSPointerUp touchEnd");
-                            self._trigger("swiped", event, { swipeDirection: swipe });
+                            self._trigger("swiped", event, { swipeDirection: swipe, swipeSpeed: speed });
                         });
                     }
                 });
@@ -82,12 +82,14 @@
 					"mousedown": function (event) {
 						self.initialXMousePosition = event.pageX;
 						self.initialYMousePosition = event.pageY;
+                                                self.initialMouseTime = (new Date()).valueOf();
 						//event.stopPropagation();
 						event.preventDefault();
 					},
 					"mouseup": function (event) {
 						var x = event.pageX;
 						var y = event.pageY;
+                                                var time = (new Date()).valueOf();
 						//event.stopPropagation();
 						event.preventDefault();
 
@@ -96,9 +98,9 @@
 						if (mouseSwipeLength >= self.options.minMouseSwipeLength) {
 							var swipeAngle = self.getSwipeAngle(self.initialXMousePosition, x, self.initialYMousePosition, y);
 							var swipeDirection = self.determineSwipeDirection(swipeAngle);
-
+                                                        var swipeSpeed = mouseSwipeLength/(time - self.initialMouseTime);
 							if (swipeDirection != null) {
-								self._trigger('swiped', event, { swipeDirection: swipeDirection });
+								self._trigger('swiped', event, { swipeDirection: swipeDirection, swipeSpeed: swipeSpeed });
 							}
 						}
 						self.initialXMousePosition = null;
@@ -143,6 +145,7 @@
                     self.touchCancel(event);
                 }
             }
+            self.startTouchTime = (new Date()).valueOf();
         },
 
         touchMove: function (event) {
@@ -167,6 +170,7 @@
                     self.touchCancel(event);
                 }
             }
+            self.currentTouchTime = (new Date()).valueOf();
         },
 
         touchEnd: function (event, callback) {
@@ -180,7 +184,8 @@
                 if (self.swipeLength >= self.options.minSwipeLength) {
                     var swipeAngle = self.getSwipeAngle(self.startTouchXPosition, self.currentXTouchPosition, self.startTouchYPosition, self.currentYTouchPosition);
                     var swipeDirection = self.determineSwipeDirection(swipeAngle);
-                    callback(swipeDirection); // callback with the swipe direction
+                    var swipeSpeed = self.swipeLength/(self.currentTouchTime-self.startTouchTime);
+                    callback(swipeDirection, swipeSpeed); // callback with the swipe direction and speed
                     self.touchCancel(event); // reset the variables
                 } else {
                     self.touchCancel(event);
@@ -195,7 +200,8 @@
                     if (self.swipeLength >= self.options.minSwipeLength) {
                         var swipeAngle = self.getSwipeAngle(self.startTouchXPosition, self.currentXTouchPosition, self.startTouchYPosition, self.currentYTouchPosition);
                         var swipeDirection = self.determineSwipeDirection(swipeAngle);
-                        callback(swipeDirection); // callback with the swipe direction
+                        var swipeSpeed = self.swipeLength/(self.currentTouchTime-self.startTouchTime);
+                        callback(swipeDirection, swipeSpeed); // callback with the swipe direction and speed
                         self.touchCancel(event); // reset the variables
                     } else {
                         self.touchCancel(event);
@@ -215,6 +221,8 @@
             self.currentXTouchPosition = 0;
             self.currentYTouchPosition = 0;
             self.swipeLength = 0;
+            self.startTouchTime = 0;
+            self.currentTouchTime = 0;
         },
 
         calculateSwipeAngle: function (startXPos, currentXPos, startYPos, currentYPos) {
