@@ -207,6 +207,9 @@
                         self.touchCancel(event);
                     }
                 } else {
+                    // Still call the callback so it can be interpretted as a single touch or click.
+                    self.swipeLength = 0;
+                    callback('left', 0);
                     self.touchCancel(event);
                 }
             }
