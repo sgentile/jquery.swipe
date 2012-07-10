@@ -1,56 +1,56 @@
 /*
-* swipe 1.0.2 - jQuery UI Widget
-* https://github.com/sgentile/jquery.swipe
-* Copyright (c) 2011 Steve Gentile (http://twitter.com/stevemgentile)
-* Dual licensed under the MIT and GPL licenses
-*/
+ * swipe 1.0.2 - jQuery UI Widget
+ * https://github.com/sgentile/jquery.swipe
+ * Copyright (c) 2011 Steve Gentile (http://twitter.com/stevemgentile)
+ * Dual licensed under the MIT and GPL licenses
+ */
 (function ($, debug) {
-	$.widget("ui.swipe", {
-		options: {
-			minSwipeLength: 65, // the shortest distance the user may swipe - the lower the number the more sensitive
-			minMouseSwipeLength: 300,
-			preventDefault: false, //used on TouchStart - setting this to true would negate things like button press from working, etc...
-			includeMouseSwipe: false  //set to true to enable for mouse swipe
+    $.widget("ui.swipe", {
+	options: {
+	    minSwipeLength: 65, // the shortest distance the user may swipe - the lower the number the more sensitive
+	    minMouseSwipeLength: 300,
+	    preventDefault: false, //used on TouchStart - setting this to true would negate things like button press from working, etc...
+	    includeMouseSwipe: false  //set to true to enable for mouse swipe
+	},
+
+	touchesCount: 0, //number of finders
+	startTouchXPosition: 0, //initial start location  x
+	startTouchYPosition: 0, //initial start location  x
+	currentXTouchPosition: 0,
+	currentYTouchPosition: 0,
+	swipeLength: 0,
+	previousPosition: {},
+
+	initialXMousePosition: null, //for mouse
+	initialYMousePosition: null, //for mouse
+
+
+	swiped: function (e, ui) { },
+
+	_create: function () {
+	    var self = this;
+	    var $touch = this.element;
+
+	    $touch.bind({
+		"touchstart": function (event) {
+		    //http://stackoverflow.com/questions/671498/jquery-live-removing-iphone-touch-event-attributes
+		    self.touchStart(event.originalEvent);
 		},
+		"touchmove": function (event) {
+		    self.touchMove(event.originalEvent);
 
-		touchesCount: 0, //number of finders
-		startTouchXPosition: 0, //initial start location  x
-		startTouchYPosition: 0, //initial start location  x
-		currentXTouchPosition: 0,
-		currentYTouchPosition: 0,
-		swipeLength: 0,
-		previousPosition: {},
-
-		initialXMousePosition: null, //for mouse
-		initialYMousePosition: null, //for mouse
-
-
-		swiped: function (e, ui) { },
-
-		_create: function () {
-			var self = this;
-			var $touch = this.element;
-
-			$touch.bind({
-				"touchstart": function (event) {
-					//http://stackoverflow.com/questions/671498/jquery-live-removing-iphone-touch-event-attributes
-					self.touchStart(event.originalEvent);
-				},
-				"touchmove": function (event) {
-					self.touchMove(event.originalEvent);
-
-				},
-				"touchcancel": function (event) {
-					self.touchCancel(event.originalEvent);
-				},
-				"touchend": function (event) {
-					self.touchEnd(event.originalEvent, function (swipe, speed) {
-						self._trigger("swiped", event, { swipeDirection: swipe, swipeSpeed: speed });
-					});
-				}
-			});
-			//WIndows 8 touch support
-			if (window.navigator.msPointerEnabled) {
+		},
+		"touchcancel": function (event) {
+		    self.touchCancel(event.originalEvent);
+		},
+		"touchend": function (event) {
+		    self.touchEnd(event.originalEvent, function (swipe, speed) {
+			self._trigger("swiped", event, { swipeDirection: swipe, swipeSpeed: speed });
+		    });
+		}
+	    });
+	    //WIndows 8 touch support
+	    if (window.navigator.msPointerEnabled) {
                 debug.info("msPointerEnabled");
                 $touch.on({
                     "MSPointerDown": function (event) {
@@ -66,7 +66,7 @@
                     "MSPointerOut": function (event) {
                         debug.info("MSPointerOut");
                         self.touchCancel(event.originalEvent);
-                       
+                        
                     },
                     "MSPointerUp": function (event) {
                         debug.info("MSPointerUp");
@@ -77,40 +77,40 @@
                     }
                 });
             }
-			if (self.options.includeMouseSwipe) {
-				$touch.bind({
-					"mousedown": function (event) {
-						self.initialXMousePosition = event.pageX;
-						self.initialYMousePosition = event.pageY;
-                                                self.initialMouseTime = (new Date()).valueOf();
-						//event.stopPropagation();
-						event.preventDefault();
-					},
-					"mouseup": function (event) {
-						var x = event.pageX;
-						var y = event.pageY;
-                                                var time = (new Date()).valueOf();
-						//event.stopPropagation();
-						event.preventDefault();
+	    if (self.options.includeMouseSwipe) {
+		$touch.bind({
+		    "mousedown": function (event) {
+			self.initialXMousePosition = event.pageX;
+			self.initialYMousePosition = event.pageY;
+                        self.initialMouseTime = (new Date()).valueOf();
+			//event.stopPropagation();
+			event.preventDefault();
+		    },
+		    "mouseup": function (event) {
+			var x = event.pageX;
+			var y = event.pageY;
+                        var time = (new Date()).valueOf();
+			//event.stopPropagation();
+			event.preventDefault();
 
-						var mouseSwipeLength = self.calculateSwipeAngle(self.initialXMousePosition, x, self.initialYMousePosition, y);
-						// if the user swiped more than the minimum length, perform the appropriate action
-						if (mouseSwipeLength >= self.options.minMouseSwipeLength) {
-							var swipeAngle = self.getSwipeAngle(self.initialXMousePosition, x, self.initialYMousePosition, y);
-							var swipeDirection = self.determineSwipeDirection(swipeAngle);
-                                                        var swipeSpeed = mouseSwipeLength/(time - self.initialMouseTime);
-							if (swipeDirection != null) {
-								self._trigger('swiped', event, { swipeDirection: swipeDirection, swipeSpeed: swipeSpeed });
-							}
-						}
-						self.initialXMousePosition = null;
-						self.initialYMousePosition = null;
-					}
-				});
+			var mouseSwipeLength = self.calculateSwipeAngle(self.initialXMousePosition, x, self.initialYMousePosition, y);
+			// if the user swiped more than the minimum length, perform the appropriate action
+			if (mouseSwipeLength >= self.options.minMouseSwipeLength) {
+			    var swipeAngle = self.getSwipeAngle(self.initialXMousePosition, x, self.initialYMousePosition, y);
+			    var swipeDirection = self.determineSwipeDirection(swipeAngle);
+                            var swipeSpeed = mouseSwipeLength/(time - self.initialMouseTime);
+			    if (swipeDirection != null) {
+				self._trigger('swiped', event, { swipeDirection: swipeDirection, swipeSpeed: swipeSpeed });
+			    }
 			}
+			self.initialXMousePosition = null;
+			self.initialYMousePosition = null;
+		    }
+		});
+	    }
 
-		},
-		touchStart: function (event) {
+	},
+	touchStart: function (event) {
             var self = this;
 
             if (self.options.preventDefault) {
